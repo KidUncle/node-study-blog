@@ -1,4 +1,7 @@
-const { login } = require('../controller/user');
+const {
+  login
+} = require('../controller/user');
+const { set } = require('../db/redis');
 const {
   SuccessModel,
   ErrorModel
@@ -15,6 +18,8 @@ const handleUserRouter = (req, res) => {
     const result = login(username, password);
     return result.then(data => {
       if (data.username) {
+
+        set(req.sessionId, req.session)
         return new SuccessModel(data);
       }
       return new ErrorModel("登录失败");
@@ -23,7 +28,7 @@ const handleUserRouter = (req, res) => {
 
   // 登陆验证的测试
   if (method === "GET" && req.path === "/api/user/login-test") {
-    
+
   }
 }
 

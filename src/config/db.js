@@ -7,7 +7,7 @@ let REDIS_CONF
 
 if (env === 'dev') {
   // mysql
-  MYSQL_CONF = {
+  MYSQL_CONF = { 
     host: 'localhost',
     user: 'root',
     password: '123456',
