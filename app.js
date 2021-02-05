@@ -41,6 +41,7 @@ const getPostData = req => {
         })
         return;
       }
+      console.log('JSON.parse(postData):', JSON.parse(postData))
       resolve(JSON.parse(postData));
     })
   })
@@ -74,6 +75,7 @@ const serverHandle = (req, res) => {
   let userId = req.cookie.userid;
   console.log("userId", userId);
   if (!userId) {
+    console.log('create userId')
     needSetCookie = true;
     userId = `${Date.now()}_${Math.random()}`;
     // 初始化redis 中session的初始值
@@ -90,8 +92,10 @@ const serverHandle = (req, res) => {
         //
         set(req.sessionId, {})
         req.session = {};
+        console.log('req.session', req.session)
       } else {
-        req.sessionId = sessionData
+        req.session = sessionData;
+        console.log('req.session:', req.session)
       }
       return getPostData(req);
     })
@@ -99,12 +103,13 @@ const serverHandle = (req, res) => {
       req.body = postData;
 
       const blogResult = handleBlogRouter(req, res)
+      // 处理 blog 路由
       if (blogResult) {
         blogResult.then(blogData => {
           if (needSetCookie) {
             res.setHeader(
               "Set-Cookie",
-              `userid=${userId};path='/';httpOnly;expires=${getCookieExpires()}`
+              `userid=${userId};path=/;httpOnly;expires=${getCookieExpires()}`
             )
           }
           res.end(JSON.stringify(blogData))
@@ -113,13 +118,12 @@ const serverHandle = (req, res) => {
       }
       // 处理 user 路由
       const userResult = handleUserRouter(req, res)
-
       if (userResult) {
         userResult.then(userData => {
           if (needSetCookie) {
             res.setHeader(
               "Set-Cookie",
-              `userid=${userId};path='/';httpOnly;expires=${getCookieExpires()}`
+              `userid=${userId};path=/;httpOnly;expires=${getCookieExpires()}`
             );
           }
           res.end(JSON.stringify(userData));

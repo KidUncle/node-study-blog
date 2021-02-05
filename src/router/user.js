@@ -1,7 +1,9 @@
 const {
   login
 } = require('../controller/user');
-const { set } = require('../db/redis');
+const {
+  set
+} = require('../db/redis');
 const {
   SuccessModel,
   ErrorModel
@@ -18,6 +20,9 @@ const handleUserRouter = (req, res) => {
     const result = login(username, password);
     return result.then(data => {
       if (data.username) {
+        // 设置session
+        req.session.username = data.username;
+        req.session.realname = data.realname;
 
         set(req.sessionId, req.session)
         return new SuccessModel(data);
